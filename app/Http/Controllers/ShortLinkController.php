@@ -109,6 +109,25 @@ class ShortLinkController extends Controller
     }
 
     /**
+     * Update the authenticated admin password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'Password updated successfully!');
+    }
+
+    /**
      * Generate a unique slug that doesn't exist in the database.
      */
     private function generateUniqueSlug(): string

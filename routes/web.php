@@ -18,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/links', [ShortLinkController::class, 'store'])->name('links.store');
     Route::patch('/links/{shortLink}', [ShortLinkController::class, 'update'])->name('links.update');
     Route::delete('/links/{shortLink}', [ShortLinkController::class, 'destroy'])->name('links.destroy');
+    Route::put('/settings/password', [ShortLinkController::class, 'updatePassword'])->name('settings.password.update');
 });
 
 // Short URL redirect — must be last to avoid catching other routes

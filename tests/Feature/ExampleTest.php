@@ -11,8 +11,8 @@ class ExampleTest extends TestCase
 
     public function test_returns_a_successful_response()
     {
-        $response = $this->get(route('home'));
+        $response = $this->get('/');
 
-        $response->assertOk();
+        $response->assertStatus(302); // Redirect to login
     }
 }

@@ -13,7 +13,10 @@ import {
     AlertTriangle,
     QrCode,
     Download,
-    Loader2
+    Loader2,
+    Settings,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -383,6 +386,234 @@ function ConfirmModal({
     );
 }
 
+// ─── Settings Modal Component ───────────────────────────────────────────────
+
+function SettingsModal({ onClose }: { onClose: () => void }) {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        current_password: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const [showCurrent, setShowCurrent] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put('/settings/password', {
+            onSuccess: () => {
+                reset();
+                onClose();
+            },
+        });
+    };
+
+    // Translate Laravel default English errors to Indonesian
+    const translateError = (err: string | undefined) => {
+        if (!err) {
+            return '';
+        }
+
+        const lowercaseErr = err.toLowerCase();
+
+        if (
+            lowercaseErr.includes('password is incorrect') ||
+            lowercaseErr.includes('password saat ini salah')
+        ) {
+            return 'Password saat ini salah.';
+        }
+
+        if (lowercaseErr.includes('required')) {
+            return 'Kolom ini wajib diisi.';
+        }
+
+        if (
+            lowercaseErr.includes('confirmation does not match') ||
+            lowercaseErr.includes('confirmation')
+        ) {
+            return 'Konfirmasi password baru tidak cocok.';
+        }
+
+        if (
+            lowercaseErr.includes('at least 8 characters') ||
+            lowercaseErr.includes('minimal 8 karakter')
+        ) {
+            return 'Password baru minimal harus 8 karakter.';
+        }
+
+        if (
+            lowercaseErr.includes('different') ||
+            lowercaseErr.includes('must be different')
+        ) {
+            return 'Password baru harus berbeda dengan password saat ini.';
+        }
+
+        return err;
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 cursor-pointer bg-slate-900/40 backdrop-blur-sm transition-opacity"
+                onClick={onClose}
+            />
+
+            {/* Modal Box */}
+            <div className="relative w-full max-w-md animate-in overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                    <div className="flex items-center gap-2">
+                        <Settings className="h-5 w-5 text-slate-500" />
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            Pengaturan Keamanan
+                        </h3>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                    >
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4 p-6">
+                    {/* Current Password */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                            Password Saat Ini{' '}
+                            <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showCurrent ? 'text' : 'password'}
+                                value={data.current_password}
+                                onChange={(e) =>
+                                    setData('current_password', e.target.value)
+                                }
+                                placeholder="Tulis password lama"
+                                required
+                                className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-10 pl-3 text-sm text-slate-800 placeholder-slate-400 transition-colors outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowCurrent(!showCurrent)}
+                                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-slate-400 hover:text-slate-600"
+                            >
+                                {showCurrent ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </div>
+                        {errors.current_password && (
+                            <p className="text-xs text-rose-500">
+                                {translateError(errors.current_password)}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* New Password */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                            Password Baru{' '}
+                            <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showNew ? 'text' : 'password'}
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
+                                placeholder="Minimal 8 karakter"
+                                required
+                                className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-10 pl-3 text-sm text-slate-800 placeholder-slate-400 transition-colors outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowNew(!showNew)}
+                                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-slate-400 hover:text-slate-600"
+                            >
+                                {showNew ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </div>
+                        {errors.password && (
+                            <p className="text-xs text-rose-500">
+                                {translateError(errors.password)}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Confirm New Password */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                            Konfirmasi Password Baru{' '}
+                            <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showConfirm ? 'text' : 'password'}
+                                value={data.password_confirmation}
+                                onChange={(e) =>
+                                    setData(
+                                        'password_confirmation',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder="Ulangi password baru"
+                                required
+                                className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-10 pl-3 text-sm text-slate-800 placeholder-slate-400 transition-colors outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirm(!showConfirm)}
+                                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-slate-400 hover:text-slate-600"
+                            >
+                                {showConfirm ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                        </div>
+                        {errors.password_confirmation && (
+                            <p className="text-xs text-rose-500">
+                                {translateError(errors.password_confirmation)}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Footer / Action buttons */}
+                    <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="cursor-pointer rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-500 active:scale-95"
+                        >
+                            {processing ? 'Menyimpan...' : 'Perbarui Password'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 // ─── QR Code Modal Component ───────────────────────────────────────────────
 
 function QrCodeModal({
@@ -485,12 +716,13 @@ function QrCodeModal({
                 {/* QR Display */}
                 <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-4">
                     <div className="relative flex h-48 w-48 items-center justify-center rounded-lg border border-slate-100 bg-white p-2 shadow-sm">
-                        
                         {/* Loading Spinner */}
                         {loading && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg z-10">
-                                <Loader2 className="h-8 w-8 text-violet-600 animate-spin" />
-                                <span className="mt-2 text-xs font-semibold text-slate-500">Memuat...</span>
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-white/95">
+                                <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
+                                <span className="mt-2 text-xs font-semibold text-slate-500">
+                                    Memuat...
+                                </span>
                             </div>
                         )}
 
@@ -504,7 +736,7 @@ function QrCodeModal({
 
                         {/* Transparent Logo in the exact center using absolute positioning */}
                         {!loading && (
-                            <div className="absolute inset-0 flex items-center justify-center animate-in fade-in duration-300">
+                            <div className="absolute inset-0 flex animate-in items-center justify-center duration-300 fade-in">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-100 bg-white p-1 shadow-sm">
                                     <img
                                         src="/logo.png"
@@ -580,6 +812,7 @@ function StatCard({
 
 export default function Dashboard({ links, stats }: Props) {
     const [showModal, setShowModal] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [qrTarget, setQrTarget] = useState<{
@@ -600,6 +833,8 @@ export default function Dashboard({ links, stats }: Props) {
                 successMsg = 'Short link berhasil diperbarui!';
             } else if (flash.success.includes('deleted')) {
                 successMsg = 'Short link berhasil dihapus!';
+            } else if (flash.success.includes('Password updated')) {
+                successMsg = 'Password berhasil diperbarui!';
             }
 
             toast.success(successMsg);
@@ -665,6 +900,13 @@ export default function Dashboard({ links, stats }: Props) {
                             >
                                 <Plus className="h-4 w-4" />
                                 <span>Link Baru</span>
+                            </button>
+                            <button
+                                onClick={() => setShowSettings(true)}
+                                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                title="Pengaturan Keamanan"
+                            >
+                                <Settings className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={() => setShowLogoutConfirm(true)}
@@ -862,6 +1104,11 @@ export default function Dashboard({ links, stats }: Props) {
             {/* Create Modal */}
             {showModal && (
                 <CreateLinkModal onClose={() => setShowModal(false)} />
+            )}
+
+            {/* Settings Modal */}
+            {showSettings && (
+                <SettingsModal onClose={() => setShowSettings(false)} />
             )}
 
             {/* QR Code Viewer Modal */}
