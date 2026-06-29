@@ -5,11 +5,16 @@ use App\Http\Controllers\ShortLinkController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Root redirect to dashboard (or login if not authenticated)
+// Root redirect to login
 Route::get('/', function () {
-    return Auth::check()
-        ? redirect()->route('dashboard')
-        : redirect()->to('/login?logged_out=1');
+    return redirect()->to('/login');
+});
+
+// Explicit login route rendering
+Route::middleware(['guest'])->group(function () {
+    Route::get('/login', function () {
+        return Inertia\Inertia::render('auth/login');
+    })->name('login');
 });
 
 // Authenticated routes
