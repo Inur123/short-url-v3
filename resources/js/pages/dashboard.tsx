@@ -10,7 +10,10 @@ import {
     Trash2,
     X,
     LogOut,
-    AlertTriangle
+    AlertTriangle,
+    QrCode,
+    Download,
+    Loader2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -20,7 +23,10 @@ import AppLogoIcon from '@/components/app-logo-icon';
 
 function ShortUrlLogo({ size = 32 }: { size?: number }) {
     return (
-        <div style={{ width: size, height: size }} className="flex items-center justify-center">
+        <div
+            style={{ width: size, height: size }}
+            className="flex items-center justify-center"
+        >
             <AppLogoIcon className="h-full w-full object-contain" />
         </div>
     );
@@ -71,7 +77,7 @@ function CopyButton({ text }: { text: string }) {
         <button
             onClick={handleCopy}
             title="Salin short link"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 active:scale-95 cursor-pointer"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 active:scale-95"
         >
             {copied ? (
                 <Check className="h-4 w-4 text-emerald-600" />
@@ -144,7 +150,7 @@ function CreateLinkModal({ onClose }: { onClose: () => void }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity cursor-pointer"
+                className="absolute inset-0 cursor-pointer bg-slate-900/40 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
@@ -157,7 +163,7 @@ function CreateLinkModal({ onClose }: { onClose: () => void }) {
                     </h3>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+                        className="cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -267,7 +273,7 @@ function CreateLinkModal({ onClose }: { onClose: () => void }) {
                             onClick={() =>
                                 setData('is_active', !data.is_active)
                             }
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                            className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors ${
                                 data.is_active
                                     ? 'bg-violet-600'
                                     : 'bg-slate-200'
@@ -288,14 +294,14 @@ function CreateLinkModal({ onClose }: { onClose: () => void }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 cursor-pointer"
+                            className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-500 active:scale-95 cursor-pointer"
+                            className="cursor-pointer rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-500 active:scale-95"
                         >
                             {processing ? 'Menyimpan...' : 'Buat Link'}
                         </button>
@@ -327,17 +333,28 @@ function ConfirmModal({
 }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
-            <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+                onClick={onClose}
+            />
+            <div className="relative w-full max-w-md animate-in overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl duration-200 zoom-in-95 fade-in">
                 <div className="flex items-start gap-4">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                        type === 'danger' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'
-                    }`}>
+                    <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                            type === 'danger'
+                                ? 'bg-rose-50 text-rose-600'
+                                : 'bg-amber-50 text-amber-600'
+                        }`}
+                    >
                         <AlertTriangle className="h-5 w-5" />
                     </div>
                     <div className="space-y-1.5">
-                        <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
-                        <p className="text-sm text-slate-500 leading-relaxed">{message}</p>
+                        <h3 className="text-lg font-semibold text-slate-800">
+                            {title}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-slate-500">
+                            {message}
+                        </p>
                     </div>
                 </div>
 
@@ -345,20 +362,181 @@ function ConfirmModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
+                        className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
                     >
                         {cancelText}
                     </button>
                     <button
                         type="button"
                         onClick={onConfirm}
-                        className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors cursor-pointer ${
-                            type === 'danger' 
-                                ? 'bg-rose-600 hover:bg-rose-500' 
+                        className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors ${
+                            type === 'danger'
+                                ? 'bg-rose-600 hover:bg-rose-500'
                                 : 'bg-violet-600 hover:bg-violet-500'
                         }`}
                     >
                         {confirmText}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── QR Code Modal Component ───────────────────────────────────────────────
+
+function QrCodeModal({
+    shortUrl,
+    title,
+    onClose,
+}: {
+    shortUrl: string;
+    title: string;
+    onClose: () => void;
+}) {
+    const [loading, setLoading] = useState(true);
+
+    // Generate QR Code dari QR Server API (resolusi tinggi 500x500 untuk download/display)
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(shortUrl)}&ecc=H`;
+
+    const handleDownload = async () => {
+        try {
+            // 1. Load QR Code image
+            const qrImg = new Image();
+            qrImg.crossOrigin = 'anonymous'; // Avoid CORS tainted canvas
+            qrImg.src = qrImageUrl;
+
+            // 2. Load Logo image
+            const logoImg = new Image();
+            logoImg.src = '/logo.png';
+
+            await Promise.all([
+                new Promise((resolve) => {
+                    qrImg.onload = resolve;
+                }),
+                new Promise((resolve) => {
+                    logoImg.onload = resolve;
+                }),
+            ]);
+
+            // 3. Create virtual canvas with padding margin (1160x1160 px total)
+            const canvas = document.createElement('canvas');
+            canvas.width = 1160;
+            canvas.height = 1160;
+            const ctx = canvas.getContext('2d');
+
+            if (ctx) {
+                // Fill background with solid white
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, 1160, 1160);
+
+                // Draw QR Code to canvas with 80px padding/margin on all sides
+                ctx.drawImage(qrImg, 80, 80, 1000, 1000);
+
+                // Draw white background container for logo in the center
+                const logoSize = 220; // HD proportion
+                const x = (1160 - logoSize) / 2;
+                const y = (1160 - logoSize) / 2;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(x - 12, y - 12, logoSize + 24, logoSize + 24, 18);
+                ctx.fill();
+
+                // Draw transparent logo on top
+                ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+            }
+
+            // 4. Download merged canvas image
+            const dataUrl = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `qrcode-${title || 'link'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            toast.success('QR Code berhasil diunduh!');
+        } catch (err) {
+            toast.error('Gagal mengunduh QR Code.');
+            console.error(err);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+                className="absolute inset-0 cursor-pointer bg-slate-900/40 backdrop-blur-sm transition-opacity"
+                onClick={onClose}
+            />
+            <div className="relative w-full max-w-sm animate-in overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl duration-200 zoom-in-95 fade-in">
+                {/* Header */}
+                <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-4">
+                    <h3 className="truncate pr-4 text-lg font-semibold text-slate-800">
+                        QR Code: {title || 'Short Link'}
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="cursor-pointer rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                    >
+                        <X className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* QR Display */}
+                <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <div className="relative flex h-48 w-48 items-center justify-center rounded-lg border border-slate-100 bg-white p-2 shadow-sm">
+                        
+                        {/* Loading Spinner */}
+                        {loading && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 rounded-lg z-10">
+                                <Loader2 className="h-8 w-8 text-violet-600 animate-spin" />
+                                <span className="mt-2 text-xs font-semibold text-slate-500">Memuat...</span>
+                            </div>
+                        )}
+
+                        {/* QR Code image */}
+                        <img
+                            src={qrImageUrl}
+                            alt="QR Code"
+                            onLoad={() => setLoading(false)}
+                            className={`h-full w-full rounded-md object-contain transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}
+                        />
+
+                        {/* Transparent Logo in the exact center using absolute positioning */}
+                        {!loading && (
+                            <div className="absolute inset-0 flex items-center justify-center animate-in fade-in duration-300">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-100 bg-white p-1 shadow-sm">
+                                    <img
+                                        src="/logo.png"
+                                        alt="Logo"
+                                        className="h-full w-full object-contain"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <p className="mt-4 max-w-full truncate font-mono text-xs font-bold text-violet-600">
+                        {shortUrl}
+                    </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex gap-3">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex-1 cursor-pointer rounded-lg border border-slate-200 py-2 text-center text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                        Tutup
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleDownload}
+                        className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-violet-600 py-2 text-sm font-semibold text-white hover:bg-violet-500 active:scale-95"
+                    >
+                        <Download className="h-4 w-4" />
+                        <span>Unduh PNG</span>
                     </button>
                 </div>
             </div>
@@ -404,6 +582,10 @@ export default function Dashboard({ links, stats }: Props) {
     const [showModal, setShowModal] = useState(false);
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [qrTarget, setQrTarget] = useState<{
+        url: string;
+        title: string;
+    } | null>(null);
 
     // Read flash message from Inertia Page props
     const { flash } = usePage().props as any;
@@ -438,9 +620,9 @@ export default function Dashboard({ links, stats }: Props) {
 
     const handleConfirmDelete = () => {
         if (deleteConfirmId) {
-            router.delete(`/links/${deleteConfirmId}`, { 
+            router.delete(`/links/${deleteConfirmId}`, {
                 preserveScroll: true,
-                onSuccess: () => setDeleteConfirmId(null)
+                onSuccess: () => setDeleteConfirmId(null),
             });
         }
     };
@@ -479,14 +661,14 @@ export default function Dashboard({ links, stats }: Props) {
                             <button
                                 id="create-link-btn"
                                 onClick={() => setShowModal(true)}
-                                className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-violet-100 transition-colors hover:bg-violet-500 active:scale-95 cursor-pointer"
+                                className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-violet-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-violet-100 transition-colors hover:bg-violet-500 active:scale-95"
                             >
                                 <Plus className="h-4 w-4" />
                                 <span>Link Baru</span>
                             </button>
                             <button
                                 onClick={() => setShowLogoutConfirm(true)}
-                                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                                 title="Keluar"
                             >
                                 <LogOut className="h-5 w-5" />
@@ -544,7 +726,7 @@ export default function Dashboard({ links, stats }: Props) {
                                 </p>
                                 <button
                                     onClick={() => setShowModal(true)}
-                                    className="mt-5 flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-500 cursor-pointer"
+                                    className="mt-5 flex cursor-pointer items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-500"
                                 >
                                     <Plus className="h-4 w-4" />
                                     Buat Link
@@ -581,11 +763,25 @@ export default function Dashboard({ links, stats }: Props) {
                                                 <CopyButton
                                                     text={link.short_url}
                                                 />
+                                                <button
+                                                    onClick={() =>
+                                                        setQrTarget({
+                                                            url: link.short_url,
+                                                            title:
+                                                                link.title ||
+                                                                link.slug,
+                                                        })
+                                                    }
+                                                    title="Tampilkan QR Code"
+                                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                                                >
+                                                    <QrCode className="h-4 w-4" />
+                                                </button>
                                                 <a
                                                     href={link.original_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+                                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                                 >
                                                     <ExternalLink className="h-4 w-4" />
                                                 </a>
@@ -632,7 +828,7 @@ export default function Dashboard({ links, stats }: Props) {
                                                             ? 'Nonaktifkan link'
                                                             : 'Aktifkan link'
                                                     }
-                                                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                                                    className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors ${
                                                         link.is_active
                                                             ? 'text-emerald-600 hover:bg-emerald-50'
                                                             : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
@@ -644,10 +840,12 @@ export default function Dashboard({ links, stats }: Props) {
                                                 {/* Delete */}
                                                 <button
                                                     onClick={() =>
-                                                        setDeleteConfirmId(link.id)
+                                                        setDeleteConfirmId(
+                                                            link.id,
+                                                        )
                                                     }
                                                     title="Hapus link"
-                                                    className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors cursor-pointer text-slate-400 hover:bg-slate-100 hover:text-rose-600"
+                                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-rose-600"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
@@ -664,6 +862,15 @@ export default function Dashboard({ links, stats }: Props) {
             {/* Create Modal */}
             {showModal && (
                 <CreateLinkModal onClose={() => setShowModal(false)} />
+            )}
+
+            {/* QR Code Viewer Modal */}
+            {qrTarget !== null && (
+                <QrCodeModal
+                    shortUrl={qrTarget.url}
+                    title={qrTarget.title}
+                    onClose={() => setQrTarget(null)}
+                />
             )}
 
             {/* Delete Confirmation Modal */}
