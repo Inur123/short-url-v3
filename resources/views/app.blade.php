@@ -13,6 +13,7 @@
 
         <link rel="icon" href="/logo.png" type="image/png">
         <link rel="apple-touch-icon" href="/logo.png">
+        <link rel="manifest" href="/manifest.json">
 
         @fonts
 
@@ -24,5 +25,15 @@
     </head>
     <body class="font-sans antialiased">
         <x-inertia::app />
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('Service Worker registered!'))
+                        .catch(err => console.log('Service Worker registration failed:', err));
+                });
+            }
+        </script>
     </body>
 </html>

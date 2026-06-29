@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -87,6 +88,7 @@ class ShortLinkController extends Controller
         $validated = $request->validate([
             'original_url' => ['sometimes', 'url', 'max:2048'],
             'title' => ['nullable', 'string', 'max:255'],
+            'slug' => ['sometimes', 'string', 'max:50', 'alpha_dash', Rule::unique('short_links')->ignore($shortLink->id)],
             'is_active' => ['sometimes', 'boolean'],
             'expired_at' => ['nullable', 'date'],
         ]);

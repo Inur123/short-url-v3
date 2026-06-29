@@ -1,11 +1,11 @@
-import { Form, Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import AppLogoIcon from '@/components/app-logo-icon';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { store } from '@/routes/login';
 
 // ─── Custom Logo ─────────────────────────────────────────────────────────────
 
@@ -42,7 +42,62 @@ function BackgroundDecor() {
 // ─── Login Page ───────────────────────────────────────────────────────────────
 
 export default function Login() {
-    const [passwordVal, setPasswordVal] = useState('');
+    const { data, setData, post, processing } = useForm({
+        email: 'admin@short.url', // Disediakan secara aman agar lolos pipeline filter internal Laravel Fortify
+        password: '',
+    });
+
+    // PWA Installation states
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+    // Listen to browser PWA install availability prompt
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e: Event) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            setDeferredPrompt(e);
+            // Show our custom banner
+            setShowInstallBanner(true);
+        };
+
+        window.addEventListener(
+            'beforeinstallprompt',
+            handleBeforeInstallPrompt,
+        );
+
+        // Also check if app is already installed/running in standalone mode
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setShowInstallBanner(false);
+        }
+
+        return () => {
+            window.removeEventListener(
+                'beforeinstallprompt',
+                handleBeforeInstallPrompt,
+            );
+        };
+    }, []);
+
+    // Trigger PWA installation native dialog
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) {
+            return;
+        }
+
+        // Show the native browser prompt
+        deferredPrompt.prompt();
+
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+
+        // We've used the prompt, and can't use it again, discard it
+        setDeferredPrompt(null);
+        setShowInstallBanner(false);
+    };
 
     // Detect ?logged_out=1 query parameter in URL
     useEffect(() => {
@@ -58,26 +113,73 @@ export default function Login() {
         }
     }, []);
 
-    // Filter characters on password input to prevent dangerous strings
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputVal = e.target.value;
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/login', {
+            onSuccess: () => {
+                toast.success('Berhasil masuk! Selamat datang.');
+            },
+            onError: (errs) => {
+                const errorText = errs?.password || errs?.email || '';
 
-        // Block dangerous SQL characters: ', ", ;, \, --
-        // Only allow letters, numbers, and basic safe symbols: @, #, $, %, ^, &, *, !, _, -, ., ?
-        const cleanVal = inputVal.replace(/['";\\-]/g, '');
-
-        if (inputVal !== cleanVal) {
-            toast.warning(
-                'Karakter berbahaya (\', ", ;, \\, -) telah diblokir demi keamanan!',
-            );
-        }
-
-        setPasswordVal(cleanVal);
+                if (
+                    errorText.toLowerCase().includes('too many') ||
+                    errorText.toLowerCase().includes('banyak percobaan')
+                ) {
+                    toast.error(
+                        'Terlalu banyak percobaan masuk. Silakan tunggu beberapa saat.',
+                    );
+                } else {
+                    toast.error(
+                        'Password yang Anda masukkan salah. Silakan coba lagi.',
+                    );
+                }
+            },
+        });
     };
 
     return (
         <>
             <Head title="Sign In — Short URL" />
+
+            {/* PWA Floating Card (Top Centered Ramping - Persis Gambar Kedua) */}
+            {showInstallBanner && (
+                <div className="fixed top-6 left-1/2 z-50 w-full max-w-md -translate-x-1/2 animate-in px-4 duration-300 fade-in slide-in-from-top sm:px-0">
+                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/95 py-2.5 pr-4 pl-3.5 shadow-xl shadow-slate-100/70 backdrop-blur-sm">
+                        <div className="flex min-w-0 items-center gap-3">
+                            {/* App Logo */}
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-white p-1.5 shadow-sm">
+                                <AppLogoIcon className="h-full w-full object-contain" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-xs leading-none font-bold text-slate-800">
+                                    Pasang Aplikasi Short URL
+                                </p>
+                                <p className="mt-1.5 truncate text-[10px] leading-none text-slate-500">
+                                    Akses cepat & stabil langsung dari Home
+                                    Screen
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-3">
+                            <button
+                                onClick={handleInstallClick}
+                                className="cursor-pointer rounded-lg bg-violet-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-violet-500 active:scale-95"
+                            >
+                                Pasang
+                            </button>
+                            <button
+                                onClick={() => setShowInstallBanner(false)}
+                                className="cursor-pointer rounded-lg p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                                title="Tutup"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="relative flex min-h-screen items-center justify-center px-4">
                 <BackgroundDecor />
@@ -99,87 +201,63 @@ export default function Login() {
 
                     {/* Login Card */}
                     <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-8 shadow-xl shadow-slate-100/50 backdrop-blur-sm">
-                        <Form
-                            {...store.form()}
-                            resetOnSuccess={['password']}
-                            onSuccess={() => {
-                                toast.success(
-                                    'Berhasil masuk! Selamat datang.',
-                                );
-                            }}
-                            onError={(errors) => {
-                                const errorText =
-                                    errors?.password || errors?.email || '';
-
-                                if (
-                                    errorText
-                                        .toLowerCase()
-                                        .includes('too many') ||
-                                    errorText
-                                        .toLowerCase()
-                                        .includes('banyak percobaan')
-                                ) {
-                                    toast.error(
-                                        'Terlalu banyak percobaan masuk. Silakan tunggu beberapa saat.',
-                                    );
-                                } else {
-                                    toast.error(
-                                        'Password yang Anda masukkan salah. Silakan coba lagi.',
-                                    );
-                                }
-                            }}
+                        <form
+                            onSubmit={handleSubmit}
                             className="flex flex-col gap-5"
                         >
-                            {({ processing }) => (
-                                <>
-                                    {/* Hidden email */}
-                                    <input
-                                        type="hidden"
-                                        name="email"
-                                        value="admin@short.url"
-                                    />
+                            <div className="flex flex-col gap-1.5">
+                                <label
+                                    htmlFor="password"
+                                    className="text-sm font-medium text-slate-600"
+                                >
+                                    Password
+                                </label>
+                                <PasswordInput
+                                    id="password"
+                                    name="password"
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    maxLength={100}
+                                    value={data.password}
+                                    onChange={(e) => {
+                                        const inputVal = e.target.value;
+                                        // Block dangerous SQL characters: ', ", ;, \, --
+                                        const cleanVal = inputVal.replace(
+                                            /['";\\-]/g,
+                                            '',
+                                        );
 
-                                    <div className="flex flex-col gap-1.5">
-                                        <label
-                                            htmlFor="password"
-                                            className="text-sm font-medium text-slate-600"
-                                        >
-                                            Password
-                                        </label>
-                                        <PasswordInput
-                                            id="password"
-                                            name="password"
-                                            required
-                                            autoFocus
-                                            tabIndex={1}
-                                            maxLength={100}
-                                            value={passwordVal}
-                                            onChange={handlePasswordChange}
-                                            autoComplete="current-password"
-                                            placeholder="Enter your password"
-                                            className="border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus-visible:border-violet-500 focus-visible:ring-1 focus-visible:ring-violet-500"
-                                        />
-                                    </div>
+                                        if (inputVal !== cleanVal) {
+                                            toast.warning(
+                                                'Karakter berbahaya (\', ", ;, \\, -) telah diblokir demi keamanan!',
+                                            );
+                                        }
 
-                                    <Button
-                                        type="submit"
-                                        className="mt-1 w-full bg-violet-600 font-semibold text-white shadow-sm shadow-violet-200 hover:bg-violet-500 active:bg-violet-700 cursor-pointer"
-                                        tabIndex={2}
-                                        disabled={processing}
-                                        data-test="login-button"
-                                    >
-                                        {processing ? (
-                                            <>
-                                                <Spinner />
-                                                Signing in...
-                                            </>
-                                        ) : (
-                                            'Sign in'
-                                        )}
-                                    </Button>
-                                </>
-                            )}
-                        </Form>
+                                        setData('password', cleanVal);
+                                    }}
+                                    autoComplete="current-password"
+                                    placeholder="Masukkan password Anda"
+                                    className="border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus-visible:border-violet-500 focus-visible:ring-1 focus-visible:ring-violet-500"
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                className="mt-1 w-full cursor-pointer bg-violet-600 font-semibold text-white shadow-sm shadow-violet-200 hover:bg-violet-500 active:bg-violet-700"
+                                tabIndex={2}
+                                disabled={processing}
+                            >
+                                {processing ? (
+                                    <>
+                                        <Spinner />
+                                        Signing in...
+                                    </>
+                                ) : (
+                                    'Sign in'
+                                )}
+                            </Button>
+                        </form>
                     </div>
 
                     {/* Footer note */}

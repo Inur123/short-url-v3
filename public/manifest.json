@@ -1,0 +1,17 @@
+{
+  "short_name": "Short URL",
+  "name": "Short URL Admin Panel",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/login",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait"
+}

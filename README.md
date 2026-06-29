@@ -6,9 +6,7 @@ Aplikasi penyingkat URL (URL Shortener) premium, minimalis, dan aman yang dibang
 
 ## ✨ Fitur Utama
 
-### 1. 🔒 Alur Otentikasi Admin Minimalis (Password-only)
-
-- Sistem masuk admin yang sangat cepat, hanya membutuhkan input **Password** tanpa repot mengetik email (email default dikelola di latar belakang secara aman).
+- Sistem masuk admin yang sangat cepat, murni hanya membutuhkan input **Password** tanpa input email sama sekali karena sistem didesain khusus untuk kepemilikan admin tunggal.
 - Desain antarmuka Login premium dengan toggle view password yang halus.
 
 ### 2. ⚡ Keamanan Berlapis (Anti-SQLi & Anti-Spam)
@@ -90,10 +88,9 @@ Buat tabel-tabel database beserta akun admin default:
 php artisan migrate --seed
 ```
 
-> Akun Admin Default:
+> Kredensial Masuk Admin:
 >
-> - **Email**: `admin@short.url` (Tersembunyi di form masuk)
-> - **Password Default**: `password` (Silakan ubah setelah masuk)
+> - **Password Default**: `password` (Silakan langsung masuk dan ubah di menu Pengaturan Keamanan)
 
 ### 7. Jalankan Server Development
 
