@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#7C3AED" />
+      <stop offset="100%" stopColor="#4F46E5" />
+    </linearGradient>
+    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#7C3AED" floodOpacity="0.25" />
+    </filter>
+  </defs>
+  
+  {/* Left Link Chain */}
+  <path d="M210 160H160C110.29 160 70 200.29 70 250C70 299.71 110.29 340 160 340H210C235 340 250 325 250 300C250 275 235 260 210 260H160C154.48 260 150 255.52 150 250C150 244.48 154.48 240 160 240H210C235 240 250 225 250 200C250 175 235 160 210 160Z" fill="url(#logoGrad)" filter="url(#glow)" />
+  
+  {/* Right Link Chain */}
+  <path d="M302 160H352C401.71 160 442 200.29 442 250C442 299.71 401.71 340 352 340H302C277 340 262 325 262 300C262 275 277 260 302 260H352C357.52 260 362 255.52 362 250C362 244.48 357.52 240 352 240H302C277 240 262 225 262 200C262 175 277 160 302 160Z" fill="url(#logoGrad)" filter="url(#glow)" />
+  
+  {/* Dynamic Redirect Center Bolt / Link bar */}
+  <path d="M200 256H312" stroke="url(#logoGrad)" strokeWidth="32" strokeLinecap="round" />
+  
+  {/* Indicator Arrow for Redirect */}
+  <path d="M280 210L326 256L280 302" stroke="url(#logoGrad)" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
+</svg>

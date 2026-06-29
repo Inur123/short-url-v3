@@ -27,4 +27,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, Request $request) {
+            if ($e->getStatusCode() === 429) {
+                return back()->withErrors([
+                    'password' => 'Terlalu banyak percobaan masuk. Silakan tunggu beberapa saat.',
+                ]);
+            }
+        });
     })->create();
