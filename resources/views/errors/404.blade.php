@@ -6,19 +6,8 @@
     <title>404 — Halaman Tidak Ditemukan</title>
     <link rel="icon" href="/logo.png" type="image/png">
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Instrument Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Laravel Vite CSS -->
+    @vite(['resources/css/app.css'])
 </head>
 <body class="bg-slate-50 antialiased font-sans flex items-center justify-center min-h-screen relative overflow-hidden">
     <!-- Background Decor (Glow & Grid) -->

@@ -13,8 +13,18 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Hanya tangani request GET
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // Jika request berhasil, kembalikan response jaringan
+        return response;
+      })
+      .catch(() => {
+        // Jika offline, coba ambil dari cache
+        return caches.match(event.request);
+      })
   );
 });

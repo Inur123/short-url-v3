@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ShortLinkController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Root redirect to login

@@ -5,18 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>500 — Kesalahan Server Internal</title>
     <link rel="icon" href="/logo.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Instrument Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Laravel Vite CSS -->
+    @vite(['resources/css/app.css'])
 </head>
 <body class="bg-slate-50 antialiased font-sans flex items-center justify-center min-h-screen relative overflow-hidden">
     <!-- Background Decor (Glow & Grid) -->
