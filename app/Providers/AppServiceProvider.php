@@ -44,7 +44,12 @@ class AppServiceProvider extends ServiceProvider
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-            : null,
+            : null
         );
+
+        // Force HTTPS in production to prevent mixed content issues on CSS/JS asset loads
+        if (app()->isProduction()) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
