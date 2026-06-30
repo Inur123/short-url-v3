@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Inline style to set the HTML background color based on our theme in app.css --}}
+        {{-- Inline style to strictly lock background color and prevent browser default leak --}}
         <style>
-            html {
-                background-color: #f8fafc; /* slate-50 */
+            html, body {
+                background-color: #f8fafc !important; /* slate-50 */
             }
         </style>
 
