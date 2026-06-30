@@ -1123,9 +1123,23 @@ export default function Dashboard({ links, stats }: Props) {
         <>
             <Head title="Dashboard — Short URL" />
 
-            <div className="min-h-screen bg-slate-50/70 text-slate-800">
+            <div className="relative min-h-screen bg-slate-50/70 text-slate-800 overflow-x-hidden">
+                {/* Background Decor (Grid Pattern + Glow) */}
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl"></div>
+                    <div className="absolute -right-40 -bottom-40 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
+                    <div
+                        className="absolute inset-0 opacity-[0.4]"
+                        style={{
+                            backgroundImage:
+                                'linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(95deg, #e2e8f0 1px, transparent 1px)',
+                            backgroundSize: '40px 40px',
+                        }}
+                    />
+                </div>
+
                 {/* Header */}
-                <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+                <header className="relative z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-md">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
                         <div className="flex items-center gap-2">
                             <ShortUrlLogo size={36} />
